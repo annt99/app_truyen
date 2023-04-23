@@ -1,6 +1,7 @@
 import 'package:app_truyen/domain/model/chapter_model.dart';
 import 'package:app_truyen/utils/color_manager.dart';
 import 'package:app_truyen/utils/font_manager.dart';
+import 'package:app_truyen/utils/route_manager.dart';
 import 'package:app_truyen/utils/styles_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,7 +16,6 @@ class ChaptersView extends StatefulWidget {
 }
 
 class _ChaptersViewState extends State<ChaptersView> {
-  
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
@@ -30,17 +30,27 @@ class _ChaptersViewState extends State<ChaptersView> {
           )),
       body: ListView(
         children: widget.chapters.reversed
-            .map((chapter) => Container(
-                  margin: const EdgeInsets.all(5),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 5, vertical: 15),
-                  decoration: BoxDecoration(
-                      color: ColorManager.lightGray,
-                      borderRadius: BorderRadius.circular(12)),
-                  child: Text(
-                    chapter.header,
-                    style: getMediumStyle(
-                        color: Colors.black, fontSize: FontSizeManager.s14),
+            .map((chapter) => GestureDetector(
+                  onTap: () {
+                    final params = {
+                      "chapters": widget.chapters.reversed.toList(),
+                      "chapter": chapter
+                    };
+                    Navigator.of(context)
+                        .pushNamed(Routes.chapterDetail, arguments: params);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 15),
+                    decoration: BoxDecoration(
+                        color: ColorManager.lightGray,
+                        borderRadius: BorderRadius.circular(12)),
+                    child: Text(
+                      chapter.header,
+                      style: getMediumStyle(
+                          color: Colors.black, fontSize: FontSizeManager.s14),
+                    ),
                   ),
                 ))
             .toList(),

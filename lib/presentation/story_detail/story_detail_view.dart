@@ -43,7 +43,7 @@ class _StoryDetailViewState extends State<StoryDetailView> {
           builder: (context, state) {
             return state.getScreenWidget(
                 context,
-                _getContentWidget(),
+                _getContentWidget(context),
                 () => context
                     .read<StoryDetaiCubit>()
                     .getChapters(widget.story.slug));
@@ -120,12 +120,15 @@ class _StoryDetailViewState extends State<StoryDetailView> {
         margin: const EdgeInsets.symmetric(horizontal: 40),
         child: ElevatedButton(
             onPressed: () {
-              final params = {
-                "chapters": chapters.reversed.toList(),
-                "index": 0
-              };
-              Navigator.of(context)
-                  .pushNamed(Routes.chapterDetail, arguments: params);
+              if (chapters.isNotEmpty) {
+                final reversList = chapters.reversed.toList();
+                final params = {
+                  "chapters": reversList,
+                  "chapter": reversList.first
+                };
+                Navigator.of(context)
+                    .pushNamed(Routes.chapterDetail, arguments: params);
+              }
             },
             child: Text(
               "Đọc truyện",
@@ -146,7 +149,7 @@ class _StoryDetailViewState extends State<StoryDetailView> {
                   color: ColorManager.primary, fontSize: FontSizeManager.s14),
             )),
       );
-  Widget lastUpdatedChapter() => Container(
+  Widget lastUpdatedChapter(BuildContext context) => Container(
         margin: const EdgeInsets.all(8),
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
@@ -178,12 +181,23 @@ class _StoryDetailViewState extends State<StoryDetailView> {
                 child: Column(
                     children: chapters
                         .sublist(0, chapters.length >= 5 ? 5 : chapters.length)
-                        .map((chapter) => ListTile(
-                              title: Text(
-                                chapter.header,
-                                style: getMediumStyle(
-                                    color: Colors.black,
-                                    fontSize: FontSizeManager.s14),
+                        .map((chapter) => GestureDetector(
+                              onTap: () {
+                                final params = {
+                                  "chapters": chapters.reversed.toList(),
+                                  "chapter": chapter
+                                };
+                                Navigator.of(context).pushNamed(
+                                    Routes.chapterDetail,
+                                    arguments: params);
+                              },
+                              child: ListTile(
+                                title: Text(
+                                  chapter.header,
+                                  style: getMediumStyle(
+                                      color: Colors.black,
+                                      fontSize: FontSizeManager.s14),
+                                ),
                               ),
                             ))
                         .toList()),
@@ -201,12 +215,12 @@ class _StoryDetailViewState extends State<StoryDetailView> {
     return listString.substring(2, listString.length);
   }
 
-  _getContentWidget() => ListView(
+  _getContentWidget(BuildContext context) => ListView(
         children: [
           posterSection(),
           detailSection(),
           readButtonSection(),
-          lastUpdatedChapter(),
+          lastUpdatedChapter(context),
           backButtonSection()
         ],
       );

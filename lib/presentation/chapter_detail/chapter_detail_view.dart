@@ -16,8 +16,8 @@ import 'package:flutter_html/flutter_html.dart';
 
 class ChapterDetailView extends StatefulWidget {
   const ChapterDetailView(
-      {super.key, required this.index, required this.chapters});
-  final int index;
+      {super.key, required this.chapter, required this.chapters});
+  final Chapter chapter;
   final List<Chapter> chapters;
 
   @override
@@ -30,8 +30,8 @@ class _ChapterDetailViewState extends State<ChapterDetailView> {
 
   @override
   Widget build(BuildContext context) {
-    _currentPage = widget.index;
-    _controller = PageController(initialPage: widget.index);
+    _currentPage = widget.chapters.indexOf(widget.chapter);
+    _controller = PageController(initialPage: _currentPage);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     return Scaffold(
         body: PageView.builder(
@@ -49,7 +49,7 @@ class _ChapterDetailViewState extends State<ChapterDetailView> {
           child: BlocBuilder<ChapterDetailCubit, ChapterDetailState>(
             builder: (context, state) {
               if (state is ChapterDetailLoaded) {
-                return _getContentWidget(state.chapter, index);
+                return _getContentWidget(context, state.chapter, index);
               }
               return state.getScreenWidget(
                   context,
@@ -64,56 +64,140 @@ class _ChapterDetailViewState extends State<ChapterDetailView> {
     ));
   }
 
-  Widget _getContentWidget(ChapterDetail chapterDetail, int index) {
+  Widget _getContentWidget(
+      BuildContext context, ChapterDetail chapterDetail, int index) {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
-      child: Column(
-        children: [
-          const SizedBox(height: 30),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 5),
-            child: Row(
-              children: [
-                Text(
-                  'Chương ${index + 1}/${widget.chapters.length}',
-                  style: getMediumStyle(color: Colors.black, fontSize: 10),
-                ),
-                const Spacer(),
-                IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.more_horiz,
-                      color: ColorManager.primary,
-                    ))
-              ],
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              primary: true,
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
+      child: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 5),
+              child: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    child: Text(
-                      chapterDetail.header,
-                      textAlign: TextAlign.center,
-                      style: getBoldStyle(
-                          color: const Color.fromARGB(255, 0, 97, 3),
-                          fontSize: FontSizeManager.s20),
-                    ),
+                  Text(
+                    'Chương ${index + 1}/${widget.chapters.length}',
+                    style: getMediumStyle(color: Colors.black, fontSize: 10),
                   ),
-                  Html(data: chapterDetail.toString())
+                  const Spacer(),
+                  IconButton(
+                      onPressed: () {
+                        _showSettingsDialog(context);
+                      },
+                      icon: Icon(
+                        Icons.more_horiz,
+                        color: ColorManager.primary,
+                      ))
                 ],
               ),
             ),
-          ),
-        ],
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                primary: true,
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      child: Text(
+                        chapterDetail.header,
+                        textAlign: TextAlign.center,
+                        style: getBoldStyle(
+                            color: const Color.fromARGB(255, 0, 97, 3),
+                            fontSize: FontSizeManager.s20),
+                      ),
+                    ),
+                    Html(data: chapterDetail.toString())
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  _showSettingsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        int brightnessValue = 50;
+        double fontSizeValue = 16.0;
+        Color backgroundColor = Colors.white;
+        return StatefulBuilder(builder: (context, mySetState) {
+          return AlertDialog(
+            title: Text('Settings'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Brightness',
+                  style: getMediumStyle(
+                      color: Colors.black, fontSize: FontSizeManager.s14),
+                ),
+                Slider(
+                  value: brightnessValue.toDouble(),
+                  min: 0,
+                  max: 100,
+                  divisions: 10,
+                  onChanged: (double value) {
+                    mySetState(() {
+                      brightnessValue = value.round();
+                    });
+                  },
+                ),
+                Text(
+                  'Font Size',
+                  style: getMediumStyle(
+                      color: Colors.black, fontSize: FontSizeManager.s14),
+                ),
+                Slider(
+                  value: fontSizeValue,
+                  min: 0.8,
+                  max: 2,
+                  divisions: 10,
+                  onChanged: (double value) {
+                    mySetState(() {
+                      fontSizeValue = value;
+                    });
+                  },
+                ),
+                Text('Background Color'),
+                // ColorPicker(
+                //   pickerColor: backgroundColor,
+                //   onColorChanged: (Color color) {
+                //     setState(() {
+                //       backgroundColor = color;
+                //     });
+                //   },
+                //   showLabel: false,
+                //   pickerAreaHeightPercent: 0.8,
+                // ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                child: Text('CANCEL'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('SAVE'),
+                onPressed: () {
+                  // TODO: Save settings
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+      },
     );
   }
 }

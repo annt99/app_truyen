@@ -49,10 +49,10 @@ class RouteGenerator {
         Map<String, dynamic> params =
             routeSettings.arguments as Map<String, dynamic>;
         List<Chapter> chapters = params["chapters"];
-        int index = params["index"];
+        Chapter chapter = params["chapter"];
         return MaterialPageRoute(
             builder: (_) =>
-                ChapterDetailView(index: index, chapters: chapters));
+                ChapterDetailView(chapter: chapter, chapters: chapters));
       default:
         return unDefinedRoute();
     }
