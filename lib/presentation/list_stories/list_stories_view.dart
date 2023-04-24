@@ -54,14 +54,13 @@ class _StoriesViewState extends State<StoriesView> {
             },
             builder: (context, state) {
               _scrollController.addListener(() {
-                if (_scrollController.offset >=
-                        _scrollController.position.maxScrollExtent &&
-                    !_scrollController.position.outOfRange) {
-                  context.read<ListStoriesCubit>().loadMoreStoriesById();
-                }
+                _onScroll(context);
               });
-              return state.getScreenWidget(context, _getContentWidget(stories),
-                  () => instance<ListStoriesCubit>().getStoriesById());
+              return state.getScreenWidget(
+                context,
+                _getContentWidget(stories),
+                _loadMoreStories,
+              );
             },
           )),
     );
@@ -130,5 +129,17 @@ class _StoriesViewState extends State<StoriesView> {
         ),
       ),
     );
+  }
+
+  void _loadMoreStories(BuildContext context) {
+    context.read<ListStoriesCubit>().loadMoreStoriesById();
+  }
+
+  void _onScroll(BuildContext context) {
+    if (_scrollController.offset >=
+            _scrollController.position.maxScrollExtent &&
+        !_scrollController.position.outOfRange) {
+      _loadMoreStories(context);
+    }
   }
 }

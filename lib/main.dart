@@ -6,5 +6,5 @@ import 'package:flutter_phoenix/flutter_phoenix.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initAppModule();
-  runApp(Phoenix(child: MyApp()));
+  runApp(MyApp());
 }

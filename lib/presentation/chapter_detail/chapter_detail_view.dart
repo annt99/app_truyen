@@ -27,6 +27,11 @@ class ChapterDetailView extends StatefulWidget {
 class _ChapterDetailViewState extends State<ChapterDetailView> {
   late int _currentPage;
   late PageController _controller;
+  int brightnessValue = 50;
+  double fontSizeValue = 1;
+  Color backgroundColor = Colors.white;
+  Color textColor = Colors.black;
+  String fontFamily = FontConstants.fontMontserrat;
 
   @override
   Widget build(BuildContext context) {
@@ -34,34 +39,35 @@ class _ChapterDetailViewState extends State<ChapterDetailView> {
     _controller = PageController(initialPage: _currentPage);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     return Scaffold(
+        backgroundColor: backgroundColor,
         body: PageView.builder(
-      controller: _controller,
-      itemCount: widget.chapters.length,
-      scrollDirection: Axis.horizontal,
-      onPageChanged: (index) {
-        _currentPage = index;
-      },
-      itemBuilder: (context, index) {
-        return BlocProvider<ChapterDetailCubit>(
-          create: (context) =>
-              ChapterDetailCubit(instance<GetChapterDetailUsecase>())
-                ..getChapterDetail(widget.chapters[index].id),
-          child: BlocBuilder<ChapterDetailCubit, ChapterDetailState>(
-            builder: (context, state) {
-              if (state is ChapterDetailLoaded) {
-                return _getContentWidget(context, state.chapter, index);
-              }
-              return state.getScreenWidget(
-                  context,
-                  Container(),
-                  () => context
-                      .read<ChapterDetailCubit>()
-                      .getChapterDetail(widget.chapters[index].id));
-            },
-          ),
-        );
-      },
-    ));
+          controller: _controller,
+          itemCount: widget.chapters.length,
+          scrollDirection: Axis.horizontal,
+          onPageChanged: (index) {
+            _currentPage = index;
+          },
+          itemBuilder: (context, index) {
+            return BlocProvider<ChapterDetailCubit>(
+              create: (context) =>
+                  ChapterDetailCubit(instance<GetChapterDetailUsecase>())
+                    ..getChapterDetail(widget.chapters[index].id),
+              child: BlocBuilder<ChapterDetailCubit, ChapterDetailState>(
+                builder: (context, state) {
+                  if (state is ChapterDetailLoaded) {
+                    return _getContentWidget(context, state.chapter, index);
+                  }
+                  return state.getScreenWidget(
+                      context,
+                      Container(),
+                      () => context
+                          .read<ChapterDetailCubit>()
+                          .getChapterDetail(widget.chapters[index].id));
+                },
+              ),
+            );
+          },
+        ));
   }
 
   Widget _getContentWidget(
@@ -78,7 +84,11 @@ class _ChapterDetailViewState extends State<ChapterDetailView> {
                 children: [
                   Text(
                     'Chương ${index + 1}/${widget.chapters.length}',
-                    style: getMediumStyle(color: Colors.black, fontSize: 10),
+                    style: getMediumStyle(
+                        color: backgroundColor == Colors.white
+                            ? Colors.black
+                            : Colors.white,
+                        fontSize: 10 * fontSizeValue),
                   ),
                   const Spacer(),
                   IconButton(
@@ -106,11 +116,23 @@ class _ChapterDetailViewState extends State<ChapterDetailView> {
                         chapterDetail.header,
                         textAlign: TextAlign.center,
                         style: getBoldStyle(
-                            color: const Color.fromARGB(255, 0, 97, 3),
-                            fontSize: FontSizeManager.s20),
+                            color: backgroundColor == Colors.white
+                                ? const Color.fromARGB(255, 0, 97, 3)
+                                : const Color.fromARGB(255, 90, 250, 95),
+                            fontSize: FontSizeManager.s20 * fontSizeValue),
                       ),
                     ),
-                    Html(data: chapterDetail.toString())
+                    Html(
+                      data: chapterDetail.toString(),
+                      style: {
+                        "p": Style(
+                            color: backgroundColor == Colors.white
+                                ? Colors.black
+                                : Colors.white,
+                            fontFamily: fontFamily,
+                            fontSize: FontSize(14 * fontSizeValue))
+                      },
+                    )
                   ],
                 ),
               ),
@@ -121,38 +143,92 @@ class _ChapterDetailViewState extends State<ChapterDetailView> {
     );
   }
 
+  void _updateScreen(double fontSize, Color color, String font) {
+    setState(() {
+      fontSizeValue = fontSize;
+      backgroundColor = color;
+      fontFamily = font;
+    });
+  }
+
   _showSettingsDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        int brightnessValue = 50;
-        double fontSizeValue = 16.0;
-        Color backgroundColor = Colors.white;
         return StatefulBuilder(builder: (context, mySetState) {
           return AlertDialog(
-            title: Text('Settings'),
+            title: const Text('Cài đặt'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Brightness',
+                  'Phông chữ',
                   style: getMediumStyle(
                       color: Colors.black, fontSize: FontSizeManager.s14),
                 ),
-                Slider(
-                  value: brightnessValue.toDouble(),
-                  min: 0,
-                  max: 100,
-                  divisions: 10,
-                  onChanged: (double value) {
-                    mySetState(() {
-                      brightnessValue = value.round();
-                    });
-                  },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Radio(
+                          value: FontConstants.fontMontserrat,
+                          groupValue: fontFamily,
+                          onChanged: (value) {
+                            mySetState(() {
+                              fontFamily = value!;
+                            });
+                          },
+                        ),
+                        Text(FontConstants.fontMontserrat,
+                            style: const TextStyle(
+                                color: Colors.black, fontSize: 11)),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Radio(
+                          value: FontConstants.fontOpensans,
+                          groupValue: fontFamily,
+                          onChanged: (value) {
+                            mySetState(() {
+                              fontFamily = value!;
+                            });
+                          },
+                        ),
+                        Text(FontConstants.fontOpensans,
+                            style: const TextStyle(
+                                color: Colors.black, fontSize: 11)),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Radio(
+                          value: FontConstants.fontRoboto,
+                          groupValue: fontFamily,
+                          onChanged: (value) {
+                            mySetState(() {
+                              fontFamily = value!;
+                            });
+                          },
+                        ),
+                        Text(FontConstants.fontRoboto,
+                            style: const TextStyle(
+                                color: Colors.black, fontSize: 11)),
+                      ],
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 10),
                 Text(
-                  'Font Size',
+                  'Kích thước chữ',
                   style: getMediumStyle(
                       color: Colors.black, fontSize: FontSizeManager.s14),
                 ),
@@ -167,7 +243,50 @@ class _ChapterDetailViewState extends State<ChapterDetailView> {
                     });
                   },
                 ),
-                Text('Background Color'),
+                Text('Màu nền',
+                    style: getMediumStyle(
+                        color: Colors.black, fontSize: FontSizeManager.s14)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Radio(
+                          value: Colors.white,
+                          groupValue: backgroundColor,
+                          onChanged: (value) {
+                            mySetState(() {
+                              backgroundColor = value!;
+                            });
+                          },
+                        ),
+                        const Text("Light",
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 11)),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Radio(
+                          value: Colors.black,
+                          groupValue: backgroundColor,
+                          onChanged: (value) {
+                            mySetState(() {
+                              backgroundColor = value!;
+                            });
+                          },
+                        ),
+                        const Text("Dark",
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 11)),
+                      ],
+                    )
+                  ],
+                ),
                 // ColorPicker(
                 //   pickerColor: backgroundColor,
                 //   onColorChanged: (Color color) {
@@ -182,15 +301,15 @@ class _ChapterDetailViewState extends State<ChapterDetailView> {
             ),
             actions: [
               TextButton(
-                child: Text('CANCEL'),
+                child: const Text('Hủy'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               TextButton(
-                child: Text('SAVE'),
+                child: const Text('Lưu'),
                 onPressed: () {
-                  // TODO: Save settings
+                  _updateScreen(fontSizeValue, backgroundColor, fontFamily);
                   Navigator.of(context).pop();
                 },
               ),

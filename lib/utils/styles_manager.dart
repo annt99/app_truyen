@@ -13,29 +13,29 @@ TextStyle _getTextStyle(
 TextStyle getRegularStyle(
     {double fontSize = FontSizeManager.s12, required Color color}) {
   return _getTextStyle(
-      fontSize, FontConstants.fontFamily, color, FontWeightManager.regular);
+      fontSize, FontConstants.fontMontserrat, color, FontWeightManager.regular);
 }
 
 TextStyle getLightStyle(
     {double fontSize = FontSizeManager.s12, required Color color}) {
   return _getTextStyle(
-      fontSize, FontConstants.fontFamily, color, FontWeightManager.light);
+      fontSize, FontConstants.fontMontserrat, color, FontWeightManager.light);
 }
 
 TextStyle getBoldStyle(
     {double fontSize = FontSizeManager.s12, required Color color}) {
   return _getTextStyle(
-      fontSize, FontConstants.fontFamily, color, FontWeightManager.bold);
+      fontSize, FontConstants.fontMontserrat, color, FontWeightManager.bold);
 }
 
 TextStyle getSemiBoldStyle(
     {double fontSize = FontSizeManager.s12, required Color color}) {
-  return _getTextStyle(
-      fontSize, FontConstants.fontFamily, color, FontWeightManager.semiBold);
+  return _getTextStyle(fontSize, FontConstants.fontMontserrat, color,
+      FontWeightManager.semiBold);
 }
 
 TextStyle getMediumStyle(
     {double fontSize = FontSizeManager.s12, required Color color}) {
   return _getTextStyle(
-      fontSize, FontConstants.fontFamily, color, FontWeightManager.medium);
+      fontSize, FontConstants.fontMontserrat, color, FontWeightManager.medium);
 }

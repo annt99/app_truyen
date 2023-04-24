@@ -48,7 +48,7 @@ class _MainViewState extends State<MainView> {
 
   SizedBox bottomNav() {
     return SizedBox(
-      height: 80,
+      height: 100,
       child: BottomNavigationBar(
         elevation: 10,
         selectedFontSize: 12,

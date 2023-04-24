@@ -6,11 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MyApp extends StatefulWidget {
-  const MyApp._internal();
-
-  static const MyApp myInstance = MyApp._internal();
-
-  factory MyApp() => myInstance;
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
