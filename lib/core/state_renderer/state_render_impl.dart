@@ -65,7 +65,7 @@ extension FlowStateExtension on FlowState {
 
   dismissDialog(BuildContext context) {
     if (_isThereCurrentDialogShowing(context)) {
-      Navigator.of(context, rootNavigator: true).pop(true);
+      Navigator.of(context, rootNavigator: true).maybePop(true);
     }
   }
 
