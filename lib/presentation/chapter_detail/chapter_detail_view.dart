@@ -72,6 +72,7 @@ class _ChapterDetailViewState extends State<ChapterDetailView> {
 
   Widget _getContentWidget(
       BuildContext context, ChapterDetail chapterDetail, int index) {
+    debugPrint("html: ${chapterDetail.toString()}");
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
@@ -123,7 +124,10 @@ class _ChapterDetailViewState extends State<ChapterDetailView> {
                       ),
                     ),
                     Html(
-                      data: chapterDetail.toString(),
+                      data: chapterDetail
+                          .toString()
+                          .replaceAll("<br><br></p><br><p></p>", ""),
+                      tagsList: Html.tags,
                       style: {
                         "p": Style(
                             color: backgroundColor == Colors.white
